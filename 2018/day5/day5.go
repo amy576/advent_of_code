@@ -1,7 +1,3 @@
-// read it
-// find Aa, aA, bB, Bb, cC, or Cc and remove
-// keep removing until the difference between the length of the last round and the new round stops changing
-
 package main
 
 import (
@@ -24,7 +20,7 @@ func q1(filename string) int {
 	f.Close()
 
 	v := len(line)
-	alpha := []string{"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"}
+	alpha := []string{"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"}
 	still_replacing := true
 
 	for still_replacing {
@@ -55,7 +51,7 @@ func q2(filename string) int {
 	f.Close()
 	line := original
 
-	alpha := []string{"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"}
+	alpha := []string{"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"}
 	shortest := 50000
 
 	for _, beta := range alpha {
