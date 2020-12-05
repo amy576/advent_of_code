@@ -216,6 +216,6 @@ func q2(filename string) int {
 }
 
 func main() {
-    // fmt.Println("part 1: ", q1("day4_input.csv"))
+    fmt.Println("part 1: ", q1("day4_input.csv"))
     fmt.Println("part 2: ", q2("day4_input.csv"))
 }
