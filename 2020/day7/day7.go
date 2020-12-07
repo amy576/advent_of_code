@@ -111,35 +111,31 @@ func q2(filename string) int {
 		}
 	}
 
-	lastBags := make(map[string]int)
-	lastBags["shiny gold"] = 1
-	fmt.Println("shiny gold")
-	var nextBags []map[string]int
-	nextBags = append(nextBags, bagRules["shiny gold"])
-	for _, element := range nextBags {
-		for key, _ := range element {
-			lastBags[key] = lastBags["shiny gold"] // nextBags is []map[string]int
-		}
+	type Bag struct {
+		color string
+		number int
+		parent_number int
 	}
-	fmt.Println(lastBags)
+
+	nextBags := []Bag{}
+	for key, element := range bagRules["shiny gold"] {
+		b := Bag{key, element, 1}
+		nextBags = append(nextBags, b)
+	}
 	for len(nextBags) > 0 {
-		fmt.Println(nextBags)
+		// fmt.Println(nextBags)
 		copyNextBags := nextBags
 		nextBags = nil
 		for _, set_of_bags := range copyNextBags {
-			for key, element := range set_of_bags {
-				fmt.Println("looking at ", key, element)
-				fmt.Println("should be multiplied by ", lastBags[key])
-				mustContain += (element * lastBags[key])
-				fmt.Println("current count is ", mustContain)
-				for nextBagKey, nextBagElement := range bagRules[key] {
-					nextBagSet := make(map[string]int)
-					nextBagSet[nextBagKey] = nextBagElement
-					nextBagSet[nextBagKey] = nextBagElement * lastBags[key]
-					// fmt.Println("setting up next bag set ",nextBagSet)
-					nextBags = append(nextBags, nextBagSet)
-					lastBags[nextBagKey] = element
-				}
+			bagColor := set_of_bags.color
+			bagNum := set_of_bags.number
+			bagMultiplier := set_of_bags.parent_number
+			// fmt.Println("looking at ", bagColor, bagNum, bagMultiplier)
+			mustContain += (bagNum * bagMultiplier)
+			// fmt.Println("current count is ", mustContain)
+			for nextBagKey, nextBagElement := range bagRules[bagColor] {
+				nb := Bag{nextBagKey, nextBagElement, bagNum * bagMultiplier}
+				nextBags = append(nextBags, nb)
 			}
 		}
 		// fmt.Println("last bags set", lastBags)
@@ -150,6 +146,6 @@ func q2(filename string) int {
 }
 
 func main() {
-    // fmt.Println("part 1: ", q1("day7_input.csv"))
-    fmt.Println("part 2: ", q2("day7_test.csv"))
+    fmt.Println("part 1: ", q1("day7_input.csv"))
+    fmt.Println("part 2: ", q2("day7_input.csv"))
 }
