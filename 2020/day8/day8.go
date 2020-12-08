@@ -44,7 +44,6 @@ type InstructionOrder struct {
 }
 
 func readInput(filename string) []Instruction {
-	// filename := "day8/day8_test.csv"
 	f, _ := os.Open(filename)
 	defer f.Close()
 	scanner := bufio.NewScanner(f)
@@ -53,16 +52,11 @@ func readInput(filename string) []Instruction {
 		line := scanner.Text()
 		lines = append(lines, line)
 	}
-	// fmt.Println(lines)
 
 	var records []Instruction
 	for _, line := range lines {
 		inc, _ := strconv.Atoi(line[4:])
 		i := Instruction{line, line[:3], inc, false}
-		// fmt.Println(line)
-		// fmt.Println(line[:3])
-		// fmt.Println(inc)
-		// fmt.Println(i)
 		records = append(records, i)
 	}
 
@@ -74,8 +68,6 @@ func executeInstructionsQ1(recordList []Instruction, start int) (int, []Instruct
 	// it will break when we've seen this instruction already
 	step := start
 	accumulation := 0
-	// fmt.Println(recordList)
-	// fmt.Println(step)
 
 	// to save ourselves time in q2, let's only keep track of
 	// EXECUTED jmp and nop orders; these should be the only
@@ -83,11 +75,14 @@ func executeInstructionsQ1(recordList []Instruction, start int) (int, []Instruct
 	var executedInstructions []InstructionOrder
 	var looped int
 
-	for step > -1 && step < len(recordList) {
-		if recordList[step].executed == false {
-			instruc := recordList[step]
+	newRecords := make([]Instruction, len(recordList))
+	copy(newRecords, recordList)
+
+	for step > -1 && step < len(newRecords) {
+		if newRecords[step].executed == false {
+			instruc := newRecords[step]
 			// fmt.Println(instruc)
-			recordList[step].executed = true
+			newRecords[step].executed = true
 			if instruc.arg == "acc" {
 				accumulation += instruc.increment
 				step ++
@@ -103,12 +98,10 @@ func executeInstructionsQ1(recordList []Instruction, start int) (int, []Instruct
 				fmt.Println(instruc)
 			}
 		} else {
-			// fmt.Println("looped")
 			looped++
 			break
 		}
 	}
-	// fmt.Println(recordList)
 	return accumulation, executedInstructions, looped
 }
 
@@ -123,19 +116,9 @@ func swapInstructionsQ2(executedRecords []InstructionOrder, recordSet []Instruct
 	for executed := len(executedRecords) - 1; executed >= 0; executed += -1 {
 		tested++
 
-		// this is AWFUL and previously i just had changedRecords := recordSet
-		// but for some reason recordSet would never set all back to false
-		// i think it's some kind of pointer thing
-		var changedRecords []Instruction
-		for _, rec := range recordSet {
-			newRec := Instruction{rec.line, rec.arg, rec.increment, false}
-			changedRecords = append(changedRecords, newRec)
-		}
-		// fmt.Println(changedRecords)
-		// for _, record := range changedRecords {
-		// 	record.executed = false
-		// }
-		// fmt.Println(executedRecords[executed])
+		changedRecords := make([]Instruction, len(recordSet))
+		copy(changedRecords, recordSet)
+
 		ogIndex := executedRecords[executed].originalIndex
 		if executedRecords[executed].arg == "nop" {
 			changedRecords[ogIndex].arg = "jmp"
@@ -143,7 +126,6 @@ func swapInstructionsQ2(executedRecords []InstructionOrder, recordSet []Instruct
 			changedRecords[ogIndex].arg = "nop"
 		}
 
-		// fmt.Println(changedRecords[ogIndex])
 		attempt, _, looped := executeInstructionsQ1(changedRecords,0)
 		if looped == 0 {
 			accumulation = attempt
@@ -161,13 +143,12 @@ func main() {
 
 	// Immediately before any instruction is
 	// executed a second time, what value is in the accumulator?
-	_, recordsPostLoop, _ := executeInstructionsQ1(inputs, 0)
+	q1, recordsPostLoop, _ := executeInstructionsQ1(inputs, 0)
 
-	for i, input := range inputs {
-		inputs[i] = Instruction{input.line, input.arg, input.increment, false}
-	}
-
+	// Fix the program so that it terminates normally by changing
+	// exactly one jmp (to nop) or nop (to jmp). What is the value
+	// of the accumulator after the program terminates?
 	q2 := swapInstructionsQ2(recordsPostLoop, inputs)
-	// fmt.Println("part 1: ", q1)
+	fmt.Println("part 1: ", q1)
 	fmt.Println("part 2: ", q2)
 }
