@@ -83,6 +83,7 @@ func q2(lines []string) int {
 	var mask [36]string
 	var masks [][]string
 	var floating []int
+	numPermutations := 1
 
 	for _, line := range lines {
 		// The bitmask is always given as a string of 36 bits, written
@@ -94,8 +95,10 @@ func q2(lines []string) int {
 				mask[i] = string(char)
 			}
 			// make mask permutations
-			fmt.Println("starting permutations")
-			masks, floating = permutateMasks(mask[:])
+			// fmt.Println("starting permutations")
+			fmt.Println(numPermutations)
+			masks, floating = permutateMasks(strings.Join(mask[:],""))
+			numPermutations++
 
 		} else if line[:3] == "mem" {
 			address, _ := strconv.Atoi(line[strings.Index(line, "[")+1:strings.Index(line, "]")])
@@ -148,24 +151,26 @@ func q2(lines []string) int {
 	return total
 }
 
-func permutateMasks(inputMask []string) ([][]string, []int) {
+func permutateMasks(inputMask string) ([][]string, []int) {
 	var permutatedMasks [][]string
-	// get the positions of all of the X's
+	xNum := strings.Count(inputMask,"X")
 	var xPos []int
 	for i, char := range inputMask {
-		if char == "X" {
+		if string(char) == "X" {
 			xPos = append(xPos, i)
 		}
 	}
-	numX := len(xPos)
-	emptarray := make([]string, numX)
+	var masksIn []string
+	masksIn = append(masksIn, inputMask)
+	// var masksOut []string
 	fmt.Println("starting to generate binaries")
-	binaries := generateBinary(numX, emptarray, 0)
-	fmt.Println("completed binary generation")
+	binaries := generateBinary(masksIn, xNum)
+	// fmt.Println("completed binary generation")
+	// fmt.Println(binaries)
 	for _, bin := range binaries {
-		tmpMask := inputMask
-		for j, char := range bin {
-			tmpMask[xPos[j]] = string(char)
+		var tmpMask []string
+		for _, char := range bin {
+			tmpMask = append(tmpMask, string(char))
 		}
 		permutatedMasks = append(permutatedMasks, tmpMask)
 	}
@@ -173,37 +178,40 @@ func permutateMasks(inputMask []string) ([][]string, []int) {
 	return permutatedMasks, xPos
 }
 
-func generateBinary(n int, arr []string, i int) []string {
-	if i == n {
+func generateBinary(arr []string, xNum int) []string {
+	if len(arr) == 1<<xNum {
+		// fmt.Println("returning arr", arr)
 		return arr
 	} else {
-		arr[i] = "0"
-		for i < len(arr) - 1 {
-			generateBinary(n, arr, i+1)
+		Recurse:
+			for i, bin := range arr {
+				// fmt.Println(i, arr)
+				// fmt.Println(bin)
+				xPos := strings.Index(bin, "X")
+				if xPos == -1 {
+					// fmt.Println("no more x's:", arr)
+					break Recurse
+				}
+				arr[i] = bin[:xPos] + "0" + bin[xPos+1:]
+				arr = append(arr, bin[:xPos] + "1" + bin[xPos+1:])
+				// fmt.Println(arr[i])
+				// fmt.Println(arr)
+			}
+			arr = generateBinary(arr, xNum)
+			return arr
 		}
-
-		arr[i] = "1"
-		for i < len(arr) - 1 {
-			generateBinary(n, arr, i+1)
-		}
-
-		return arr
-	}
-	fmt.Println(arr)
-	return arr
 }
 
 func main() {
-	filename := "day14_test_q2.csv"
+	filename := "day14_input.csv"
 	bits := readInput(filename)
 
 	// This program starts by specifying a bitmask (mask = ....).
 	// The program then attempts to write values to certain memory addresses.
 	// What is the sum of all values left in memory after it completes?
-	// q1 := q1(bits)
-	// fmt.Println("part 1: ", q1)
+	q1 := q1(bits)
+	fmt.Println("part 1: ", q1)
 
-	// The shuttle company is running a contest: one gold coin for
 	q2 := q2(bits)
 	fmt.Println("part 2: ", q2)
 }
