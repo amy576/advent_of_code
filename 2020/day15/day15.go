@@ -68,11 +68,6 @@ func q1(startNums []int, stop int) int {
 	return turns[stop]
 }
 
-
-// if seconds, ok := timeZone[tz]; ok {
-// 	return seconds
-// }
-
 func main() {
 	filename := "day15_input.csv"
 	inputs := readInput(filename)
