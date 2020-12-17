@@ -26,42 +26,32 @@ func readInput(filename string) map[Cell]string {
 		for j, char := range row {
 			// initialize one row before and one row after
 			// initialize one column before and one after
-			if i == 0 {
-				cells[Cell{i-1, j, 0}] = "inactive"
-				cells[Cell{i-1, j, -1}] = "inactive"
-				cells[Cell{i-1, j, 1}] = "inactive"
-			} else if i == len(lines) - 1 {
-				cells[Cell{i+1, j, 0}] = "inactive"
-				cells[Cell{i+1, j, -1}] = "inactive"
-				cells[Cell{i+1, j, 1}] = "inactive"
-			}
+			for z := -1; z <= 1; z++ {
+				if i == 0 {
+					cells[Cell{i-1, j, z}] = "inactive"
+				} else if i == len(lines) - 1 {
+					cells[Cell{i+1, j, z}] = "inactive"
+				}
+	
+				if j == 0 {
+					if i == 0 {
+						cells[Cell{i-1, j-1, z}] = "inactive"
+					} else if i == len(lines) - 1 {
+						cells[Cell{i+1, j-1, z}] = "inactive"
+					}
+					cells[Cell{i, j-1, z}] = "inactive"
+				} else if j == len(row) - 1 {
+					if i == 0 {
+						cells[Cell{i-1, j+1, z}] = "inactive"
+					} else if i == len(lines) - 1 {
+						cells[Cell{i+1, j+1, z}] = "inactive"
+					}
+					cells[Cell{i, j+1, z}] = "inactive"
+				}
 
-			if j == 0 {
-				if i == 0 {
-					cells[Cell{i-1, j-1, 0}] = "inactive"
-					cells[Cell{i-1, j-1, -1}] = "inactive"
-					cells[Cell{i-1, j-1, 1}] = "inactive"
-				} else if i == len(lines) - 1 {
-					cells[Cell{i+1, j-1, 0}] = "inactive"
-					cells[Cell{i+1, j-1, -1}] = "inactive"
-					cells[Cell{i+1, j-1, 1}] = "inactive"
+				if z != 0 {
+					cells[Cell{i, j, z}] = "inactive"
 				}
-				cells[Cell{i, j-1, 0}] = "inactive"
-				cells[Cell{i, j-1, -1}] = "inactive"
-				cells[Cell{i, j-1, 1}] = "inactive"
-			} else if j == len(row) - 1 {
-				if i == 0 {
-					cells[Cell{i-1, j+1, 0}] = "inactive"
-					cells[Cell{i-1, j+1, -1}] = "inactive"
-					cells[Cell{i-1, j+1, 1}] = "inactive"
-				} else if i == len(lines) - 1 {
-					cells[Cell{i+1, j+1, 0}] = "inactive"
-					cells[Cell{i+1, j+1, -1}] = "inactive"
-					cells[Cell{i+1, j+1, 1}] = "inactive"
-				}
-				cells[Cell{i, j+1, 0}] = "inactive"
-				cells[Cell{i, j+1, -1}] = "inactive"
-				cells[Cell{i, j+1, 1}] = "inactive"
 			}
 
 			var state string
@@ -73,8 +63,6 @@ func readInput(filename string) map[Cell]string {
 			cell := Cell{i, j, 0}
 			cells[cell] = state
 			// also initialize the adjacent z layers
-			cells[Cell{i, j, -1}] = "inactive"
-			cells[Cell{i, j, 1}] = "inactive"
 		}
 	}
 	return cells
