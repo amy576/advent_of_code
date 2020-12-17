@@ -12,6 +12,8 @@ type Cell struct {
 	z int
 }
 
+var defaultState = "inactive"
+
 func readInput(filename string) map[Cell]string {
 	f, _ := os.Open(filename)
 	defer f.Close()
@@ -28,29 +30,29 @@ func readInput(filename string) map[Cell]string {
 			// initialize one column before and one after
 			for z := -1; z <= 1; z++ {
 				if i == 0 {
-					cells[Cell{i-1, j, z}] = "inactive"
+					cells[Cell{i-1, j, z}] = defaultState
 				} else if i == len(lines) - 1 {
-					cells[Cell{i+1, j, z}] = "inactive"
+					cells[Cell{i+1, j, z}] = defaultState
 				}
 	
 				if j == 0 {
 					if i == 0 {
-						cells[Cell{i-1, j-1, z}] = "inactive"
+						cells[Cell{i-1, j-1, z}] = defaultState
 					} else if i == len(lines) - 1 {
-						cells[Cell{i+1, j-1, z}] = "inactive"
+						cells[Cell{i+1, j-1, z}] = defaultState
 					}
-					cells[Cell{i, j-1, z}] = "inactive"
+					cells[Cell{i, j-1, z}] = defaultState
 				} else if j == len(row) - 1 {
 					if i == 0 {
-						cells[Cell{i-1, j+1, z}] = "inactive"
+						cells[Cell{i-1, j+1, z}] = defaultState
 					} else if i == len(lines) - 1 {
-						cells[Cell{i+1, j+1, z}] = "inactive"
+						cells[Cell{i+1, j+1, z}] = defaultState
 					}
-					cells[Cell{i, j+1, z}] = "inactive"
+					cells[Cell{i, j+1, z}] = defaultState
 				}
 
 				if z != 0 {
-					cells[Cell{i, j, z}] = "inactive"
+					cells[Cell{i, j, z}] = defaultState
 				}
 			}
 
@@ -102,7 +104,7 @@ func change(startGrid map[Cell]string) (map[Cell]string) {
 							// we should only need to do this for cells adjacent
 							// to at least one active cell, since those are the only
 							// cells that have any chance of flipping to active
-							endGrid[adjacentCell] = "inactive"
+							endGrid[adjacentCell] = defaultState
 						}
 					}
 				}
