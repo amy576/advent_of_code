@@ -182,7 +182,9 @@ func main() {
 	q1, validTickets := q1(fieldValues, nearbyTickets)
 	fmt.Println("part 1: ", q1)
 
-	// Given your starting numbers, what will be the 30000000th number spoken? 
+	// Once you work out which field is which, look for the six fields on
+	// your ticket that start with the word departure. What do you get if
+	// you multiply those six values together? 
 	q2 := q2(fieldValues, validTickets, myTicket)
 	fmt.Println("part 2: ", q2)
 }
