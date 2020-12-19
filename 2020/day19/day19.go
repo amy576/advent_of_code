@@ -84,7 +84,68 @@ func rulesToRegex(rules map[string]string, end int) string {
 	return cleanedRule
 }
 
+// start at rule 0 and start replacing
+func cleanRules(rules map[string]string) map[string]string {
+	cleanedRules := make(map[string]string)
+	for num, endRule := range rules {
+		fmt.Println("cleaning", num)
+		containsNumber := dig.FindAllString(endRule, -1)
+		// fmt.Println("start with", endRule)
+		for len(containsNumber) > 0 {
+			for i, elem := range strings.Split(endRule, " ") {
+				element := strings.Trim(elem, "()")
+				var replace string
+				newReplace, present := cleanedRules[element]
+				if present {
+					replace = newReplace
+				} else {
+					replace = rules[element]
+				}
+				if len(dig.FindAllString(elem, -1)) > 0 {
+					// fmt.Println(element, ":", rules[element])
+					if strings.Contains(replace, "|") {
+						if i == 0 {
+							endRule = strings.Replace(endRule, element + " ", "(" + replace + ") ", 1)
+						} else if i == len(strings.Split(endRule, " ")) - 1 {
+							endRule = strings.Replace(endRule, " " + element, " (" + replace + ")", 1)
+						} else {
+							endRule = strings.Replace(endRule, " " + element + " ", " (" + replace + ") ", 1)
+							endRule = strings.Replace(endRule, "(" + element + " ", "((" + replace + ") ", 1)
+							endRule = strings.Replace(endRule, " " + element + ")", " (" + replace + "))", 1)
+						}
+					} else {
+						if i == 0 {
+							endRule = strings.Replace(endRule, element + " ", replace + " ", 1)
+						} else if i == len(strings.Split(endRule, " ")) - 1 {
+							endRule = strings.Replace(endRule, " " + element, " " + replace, 1)
+						} else {
+							endRule = strings.Replace(endRule, " " + element + " ", " " + replace + " ", 1)
+							endRule = strings.Replace(endRule, "(" + element + " ", "(" + replace + " ", 1)
+							endRule = strings.Replace(endRule, " " + element + ")", " " + replace + ")", 1)
+						}
+					}
+				}
+				// fmt.Println("replace element and now we have", endRule)
+			}
+			containsNumber = dig.FindAllString(endRule, -1)
+			// fmt.Println(len(endRule))
+			// fmt.Println(endRule)
+			// fmt.Println(regexp.MustCompile(strings.ReplaceAll(endRule, " ", "")))
+		}
+
+		// fmt.Println(endRule)
+
+		cleanedRule := strings.ReplaceAll(endRule, " ", "")
+		fmt.Println(cleanedRule)
+		cleanedRules[num] = cleanedRule
+	}
+
+	return cleanedRules
+}
+
 func q1(rules map[string]string, messages []string, ruleNum int) int {
+	// newRules := cleanRules(rules)
+	// re := regexp.MustCompile(newRules[strconv.Itoa(ruleNum)])
 	re := regexp.MustCompile(rulesToRegex(rules, ruleNum))
 	// iterate over messages, iterate over rules[0] and increment match number if they match
 	var valid int
@@ -103,6 +164,9 @@ func main() {
 	filename := "day19_input.csv"
 	rules, messages := readInput(filename)
 	solveFor := 0
+
+	clean := cleanRules(rules)
+	fmt.Println(clean)
 	// fmt.Println("rules: ", rules)
 	// fmt.Println("messages: ", messages)
 
@@ -110,6 +174,14 @@ func main() {
 	q1 := q1(rules, messages, solveFor)
 	fmt.Println("part 1: ", q1)
 
-	// q2 := q2(bits)
+	// Completely replace rules 8: 42 and 11: 42 31 with the following:
+	// 8: 42 | 42 8
+	// 11: 42 31 | 42 11 31
+	// rules["8"] = "42 | 42 8"
+	// rules["11"] = "42 31 | 42 11 31"
+	// now, the rules do contain loops, and the list of messages they could
+	// hypothetically match is infinite. You'll need to determine how these
+	// changes affect which messages are valid. After updating rules 8 and 11,
+	// how many messages completely match rule 0?
 	// fmt.Println("part 2: ", q2)
 }
