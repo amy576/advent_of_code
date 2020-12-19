@@ -9,13 +9,12 @@ import (
 	"regexp"
 )
 
-func readInput(filename string) (map[string][][]string, map[string]string, []string) {
+func readInput(filename string) (map[string][][]string, []string) {
 	f, _ := os.Open(filename)
 	defer f.Close()
 	scanner := bufio.NewScanner(f)
 	var messages []string
 	rules := make(map[string][][]string)
-	starterRules := make(map[string]string)
 
 	var lines []string
 	for scanner.Scan() {
@@ -30,18 +29,18 @@ func readInput(filename string) (map[string][][]string, map[string]string, []str
 			messages = append(messages, line)
 		} else if strings.Contains(line, ":") {
 			splits := strings.Split(line, ": ")
-			// if strings.Contains(line, string('"')) {
-			// 	starterRules[splits[0]] = strings.Trim(splits[1], string('"'))
-			// } else {
 			var multi [][]string
 			for _, x := range strings.Split(splits[1], " | ") {
-				multi = append(multi, strings.Split(x, " "))
+				var single []string
+				for _, y := range strings.Split(x, " ") {
+					single = append(single, strings.Trim(y, string('"')))
+				}
+				multi = append(multi, single)
 			}
 			rules[splits[0]] = multi
-			// }
 		}
 	}
-	return rules, starterRules, messages
+	return rules, messages
 }
 
 func turnIntoString(rule [][]string) string {
@@ -58,8 +57,6 @@ func turnIntoString(rule [][]string) string {
 	return ruleString
 }
 
-// combination of day 18 equational replace + day 14 permutation generation
-
 // start at rule 0 and start replacing
 func solveForRules(rules map[string][][]string, end int) []string {
 	endRule := rules[strconv.Itoa(end)] // this is a [][]string
@@ -70,22 +67,42 @@ func solveForRules(rules map[string][][]string, end int) []string {
 	for len(containsNumber) > 0 {
 		for i, ruleSet := range endRule {		 // ruleSet is a []string
 			for j, number := range ruleSet {
-				fmt.Println("number", number)
-				replace := rules[number]
-				var new string
-				for x, replaceRule := range replace {
-					new += strings.Join(replaceRule, " ")
-					if x < len(replace) -1 {
-						new += " | "
+				initialRuleSet := make([]string, len(ruleSet))
+				copy(initialRuleSet, ruleSet)
+				if number == "a" || number == "b" {
+				} else {
+					replace := rules[number] // replace is a [][]string
+
+					// replace the current ruleSet using replace[0]
+					overwriteRule := make([]string, len(ruleSet[:j]))
+					copy(overwriteRule, ruleSet[:j])
+					// endRule[i] = ruleSet[:j]
+					for _, x := range replace[0] {
+						overwriteRule = append(overwriteRule, x)
 					}
+					for _, y := range initialRuleSet[j+1:] {
+						overwriteRule = append(overwriteRule, y)
+					}
+					endRule[i] = overwriteRule
+
+					// if len(replace) > 1 then we need to append a new rule to endRule
+					if len(replace) > 1 {
+						newRule := make([]string, len(ruleSet[:j]))
+						copy(newRule, ruleSet[:j])
+						for _, x := range replace[1] {
+							newRule = append(newRule, x)
+						}
+						for _, y := range initialRuleSet[j+1:] {
+							newRule = append(newRule, y)
+						}
+						endRule = append(endRule, newRule)
+					}
+
+					break
 				}
-				fmt.Println("new", new)
-				endRule[i][j] = new
 			}
-			fmt.Println("ruleSet", endRule[i])
 			containsNumber = re.FindAllString(turnIntoString(endRule), -1)
-			fmt.Println(containsNumber)
-			fmt.Println(endRule)
+			// fmt.Println("current endRule array", endRule)
 		}
 	}
 
@@ -96,29 +113,30 @@ func solveForRules(rules map[string][][]string, end int) []string {
 	return finalStrings
 }
 
-// function to create permutations appropriately
-// assumes no more than one | in any given rule (at the start)
-
-// now go through all the rules and replace, cleaning through until there are no
-// more numbers, only a's and b's
-
-// once that's done, consolidate rules[0] into []string (strings.join all the [][]string)
-// iterate over messages, iterate over rules[0] and increment match number if they match
+func q1(rules map[string][][]string, messages []string, ruleNum int) int {
+	validStrings := solveForRules(rules, ruleNum)
+	// iterate over messages, iterate over rules[0] and increment match number if they match
+	var valid int
+	for _, message := range messages {
+		for _, validString := range validStrings {
+			if message == validString {
+				valid++
+			}
+		}
+	}
+	return valid
+}
 
 func main() {
-	filename := "day19_test.csv"
-	rules, starterRules, messages := readInput(filename)
-	fmt.Println("rules: ", rules)
-	fmt.Println("starting rules: ", starterRules)
-	fmt.Println("messages: ", messages)
+	filename := "day19_input.csv"
+	rules, messages := readInput(filename)
+	solveFor := 0
+	// fmt.Println("rules: ", rules)
+	// fmt.Println("messages: ", messages)
 
-	fmt.Println(solveForRules(rules, 0))
-
-	// This program starts by specifying a bitmask (mask = ....).
-	// The program then attempts to write values to certain memory addresses.
-	// What is the sum of all values left in memory after it completes?
-	// q1 := q1(bits)
-	// fmt.Println("part 1: ", q1)
+	// Your goal is to determine the number of messages that completely match rule 0.
+	q1 := q1(rules, messages, solveFor)
+	fmt.Println("part 1: ", q1)
 
 	// q2 := q2(bits)
 	// fmt.Println("part 2: ", q2)
