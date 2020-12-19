@@ -105,23 +105,23 @@ func cleanRules(rules map[string]string) map[string]string {
 					// fmt.Println(element, ":", rules[element])
 					if strings.Contains(replace, "|") {
 						if i == 0 {
-							endRule = strings.Replace(endRule, element + " ", "(" + replace + ") ", 1)
+							endRule = strings.Replace(endRule, element + " ", "(" + replace + ") ", -1)
 						} else if i == len(strings.Split(endRule, " ")) - 1 {
-							endRule = strings.Replace(endRule, " " + element, " (" + replace + ")", 1)
+							endRule = strings.Replace(endRule, " " + element, " (" + replace + ")", -1)
 						} else {
-							endRule = strings.Replace(endRule, " " + element + " ", " (" + replace + ") ", 1)
-							endRule = strings.Replace(endRule, "(" + element + " ", "((" + replace + ") ", 1)
-							endRule = strings.Replace(endRule, " " + element + ")", " (" + replace + "))", 1)
+							endRule = strings.Replace(endRule, " " + element + " ", " (" + replace + ") ", -1)
+							endRule = strings.Replace(endRule, "(" + element + " ", "((" + replace + ") ", -1)
+							endRule = strings.Replace(endRule, " " + element + ")", " (" + replace + "))", -1)
 						}
 					} else {
 						if i == 0 {
-							endRule = strings.Replace(endRule, element + " ", replace + " ", 1)
+							endRule = strings.Replace(endRule, element + " ", replace + " ", -1)
 						} else if i == len(strings.Split(endRule, " ")) - 1 {
-							endRule = strings.Replace(endRule, " " + element, " " + replace, 1)
+							endRule = strings.Replace(endRule, " " + element, " " + replace, -1)
 						} else {
-							endRule = strings.Replace(endRule, " " + element + " ", " " + replace + " ", 1)
-							endRule = strings.Replace(endRule, "(" + element + " ", "(" + replace + " ", 1)
-							endRule = strings.Replace(endRule, " " + element + ")", " " + replace + ")", 1)
+							endRule = strings.Replace(endRule, " " + element + " ", " " + replace + " ", -1)
+							endRule = strings.Replace(endRule, "(" + element + " ", "(" + replace + " ", -1)
+							endRule = strings.Replace(endRule, " " + element + ")", " " + replace + ")", -1)
 						}
 					}
 				}
