@@ -97,6 +97,19 @@ func rotate(tile Tile) Tile {
 func q1(borders map[int]Tile) int {
 	// By rotating, flipping, and rearranging them, you can find a square
 	// arrangement that causes all adjacent borders to line up.
+
+	// theoretically you could start with one tile, any tile
+	// then find the first tile that matches that tile on any side, any rotation
+	// then find another tile that matches the "new" boundaries of this new 2 tile set
+	// for example, if two tiles were side by side, there would be 2 possible top borders
+	// and 2 possible bottom borders to match with, but still only 1 left and 1 right
+	// then find another tile that matches the "new" boundaries of the 3 tile set
+	// at this point this could be an L shape and you'd have to basically "pop"
+	// and "append" which are the "free"/valid borders to match with still
+	// keep going until there are no "free" tiles left
+	// but then how to store the IDs in a grid?
+
+
 	for tileId, bordersToCheck := range borders {
 		// check each border while it is unset
 		for checkTile, checkBorder := range borders {
