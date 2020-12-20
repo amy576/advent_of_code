@@ -55,13 +55,13 @@ func regex(rules map[string]string, rule string) (re string) {
 func count(rules map[string]string, messages []string, ruleNum int) int {
 	// newRules := cleanRules(rules)
 	// re := regexp.MustCompile(newRules[strconv.Itoa(ruleNum)])
-	re := regexp.MustCompile("(?m)^"+regex(rules, strconv.Itoa(ruleNum))+"$")
+	re := regexp.MustCompile("^"+regex(rules, strconv.Itoa(ruleNum))+"$")
 	// re := regexp.MustCompile(regex(rules, strconv.Itoa(ruleNum)))
 	// iterate over messages, iterate over rules[0] and increment match number if they match
 	var valid int
 	for _, message := range messages {
 		found := re.FindAllString(message, -1)
-		if len(found) == 1 {
+		if len(found) > 0 {
 			if len(found[0]) == len(message) {
 				valid++
 			}
